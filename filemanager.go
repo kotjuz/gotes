@@ -7,11 +7,11 @@ import (
 	"os"
 )
 
-func ReadFile(filePath string) error {
+func ReadFile(filePath string) ([]string, error) {
 	file, err := os.Open(filePath)
 
 	if err != nil {
-		return errors.New("Failed to open the file")
+		return nil, errors.New("Failed to open the file")
 	}
 
 	defer file.Close()
@@ -26,4 +26,12 @@ func ReadFile(filePath string) error {
 		line := fmt.Sprintf("%d# %s", i, scanner.Text())
 		lines = append(lines, line)
 	}
+
+	err = scanner.Err()
+
+	if err != nil {
+		return nil, errors.New("Failed to read file")
+	}
+
+	return lines, nil
 }
