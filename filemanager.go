@@ -1,37 +1,46 @@
 package main
 
 import (
-	"bufio"
+	"encoding/json"
 	"errors"
-	"fmt"
+	"io"
 	"os"
 )
 
-func ReadFile(filePath string) ([]string, error) {
+func LoadTasks(filePath string) ([]*Task, error) {
 	file, err := os.Open(filePath)
 
 	if err != nil {
-		return nil, errors.New("Failed to open the file")
+		return nil, errors.New("failed to open the file")
 	}
 
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-
-	var lines []string
-	i := 0
-
-	for scanner.Scan() {
-		i++
-		line := fmt.Sprintf("%d# %s", i, scanner.Text())
-		lines = append(lines, line)
-	}
-
-	err = scanner.Err()
+	data, err := io.ReadAll(file)
 
 	if err != nil {
-		return nil, errors.New("Failed to read file")
+		return nil, errors.New("failed to read the file")
+	}
+	if len(data) == 0 {
+		return []*Task{}, nil
+	}
+	var tasks []*Task
+
+	if err := json.Unmarshal(data, &tasks); err != nil {
+		return nil, err
+	}
+	return tasks, nil
+}
+
+func SaveTasks(filePath string, tasks []*Task) error {
+	data, err := json.MarshalIndent(tasks, "", "	")
+	if err != nil {
+		return errors.New("failed to convert tasks to JSON")
 	}
 
-	return lines, nil
+	tmp := filePath + ".tmp"
+	if err := os.WriteFile(tmp, data, 0o644); err != nil {
+		return errors.New("failed to save data to file")
+	}
+	return os.Rename(tmp, filePath)
 }
