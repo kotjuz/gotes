@@ -13,6 +13,8 @@ type Task struct {
 	Done bool   `json:"done"`
 }
 
+func CreateTask()
+
 func ReadTasks(filePath string) error {
 	data, err := os.ReadFile(filePath)
 
