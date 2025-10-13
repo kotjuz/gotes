@@ -1,44 +1,29 @@
 package main
 
-import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"os"
-)
-
 type Task struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 	Done bool   `json:"done"`
 }
 
-func CreateTask()
-
-func ReadTasks(filePath string) error {
-	data, err := os.ReadFile(filePath)
-
-	if err != nil {
-		return errors.New("failed to open file")
-	}
-
-	var taskList []*Task
-
-	err = json.Unmarshal(data, &taskList)
-
-	if err != nil {
-		return errors.New("failed to read file")
-	}
-	WriteTasks(taskList)
-	return nil
+type TaskStore struct {
+	filePath string
+	tasks    []*Task
+	nextID   int
 }
 
-func WriteTasks(taskList []*Task) {
-	for _, task := range taskList {
-		if task.Done {
-			fmt.Printf("%d# %s", task.ID, task.Name)
-		} else {
-			fmt.Printf("(Done ✅) %d# %s", task.ID, task.Name)
+func NewTaskStore(filePath string) (*TaskStore, error) {
+	tasks, err := LoadTasks(filePath)
+	if err != nil {
+		return nil, err
+	}
+	nextID := 1
+
+	for _, t := range tasks {
+		if t.ID >= nextID {
+			nextID = t.ID + 1
 		}
 	}
+
+	return &TaskStore{filePath: filePath, tasks: tasks, nextID: nextID}, nil
 }
