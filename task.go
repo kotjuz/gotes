@@ -49,3 +49,31 @@ func (s *TaskStore) Toggle(id int) error {
 	}
 	return fmt.Errorf("task %d not found", id)
 }
+
+func (s *TaskStore) Delete(id int) error {
+	out := s.tasks[:0]
+	found := false
+	for _, t := range s.tasks {
+		if t.ID == id {
+			found = true
+			continue
+		}
+		out = append(out, t)
+	}
+
+	if !found {
+		return fmt.Errorf("task with id %d not found", id)
+	}
+	s.tasks = out
+	return SaveTasks(s.filePath, s.tasks)
+}
+
+func (s *TaskStore) Print() {
+	for _, t := range s.List() {
+		if t.Done {
+			fmt.Printf("(Done✅) %d# %s\n", t.ID, t.Name)
+		} else {
+			fmt.Printf("%d# %s\n", t.ID, t.Name)
+		}
+	}
+}
