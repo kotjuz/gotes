@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -16,7 +17,13 @@ var deleteCmd = &cobra.Command{
 	Short: "delete a task by ID",
 	Long:  "delete a task by ID long",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("delete called")
+		if DeleteTask == nil {
+			fmt.Println("delete: store not initialized")
+		}
+		if len(args) == 0 {
+			fmt.Println("delete: please provie a task ID")
+		}
+		ID := strings.TrimSpace(strings.Join(args, " "))
 	},
 }
 
