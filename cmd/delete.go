@@ -1,16 +1,14 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
 )
 
-var DeleteTask func(string) error
+var DeleteTask func(int) error
 
 var deleteCmd = &cobra.Command{
 	Use:   "delete [task ID]",
@@ -19,24 +17,25 @@ var deleteCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if DeleteTask == nil {
 			fmt.Println("delete: store not initialized")
+			return
 		}
 		if len(args) == 0 {
 			fmt.Println("delete: please provie a task ID")
+			return
 		}
-		ID := strings.TrimSpace(strings.Join(args, " "))
+		ID, err := strconv.Atoi(strings.TrimSpace(strings.Join(args, " ")))
+		if err != nil {
+			fmt.Println("delete: couldn't convert ID to int")
+			return
+		}
+		if err := DeleteTask(ID); err != nil {
+			fmt.Println("delete: ", err)
+			return
+		}
+		fmt.Println("deleted task: ", ID)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// deleteCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// deleteCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
