@@ -1,12 +1,14 @@
 package main
 
+import (
+	appcmd "github.com/kotjuz/cli_notes/cmd"
+)
+
 func main() {
 	taskStore, _ := NewTaskStore("test.json")
-	taskStore.Delete(1)
-	// fmt.Println(taskStore.List())
-	// taskStore.Add("Testowy1")
-	// fmt.Println(taskStore.List())
-	// taskStore.Print()
-	// taskStore.Toggle(2)
-	// taskStore.Print()
+	// inject store methods into cobra commands
+	appcmd.AddTask = taskStore.Add
+	appcmd.DeleteTask = taskStore.Delete
+
+	appcmd.Execute()
 }
