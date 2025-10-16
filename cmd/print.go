@@ -6,18 +6,46 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Injected from main:
+var PrintAll func()
+var PrintDone func()
+var PrintUndone func()
+
+var (
+	flagAll  bool
+	flagDone bool
+)
+
 // printCmd represents the print command
 var printCmd = &cobra.Command{
 	Use:   "print",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "print tasks",
+	Long:  "print tasks",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("print called")
+		if flagAll {
+			if PrintAll == nil {
+				fmt.Println("print: store not initialized")
+				return
+			}
+			PrintAll()
+			return
+		}
+
+		if flagDone {
+			if PrintDone == nil {
+				fmt.Println("print: store not initialized")
+				return
+			}
+			PrintDone()
+			return
+		}
+
+		if PrintUndone == nil {
+			fmt.Println("print: store not initialized")
+			return
+		}
+		// Default: print only not-done tasks
+		PrintUndone()
 	},
 }
 
@@ -30,7 +58,7 @@ func init() {
 	// and all subcommands, e.g.:
 	// printCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// printCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// Flags
+	printCmd.Flags().BoolVarP(&flagAll, "all", "a", false, "print all tasks")
+	printCmd.Flags().BoolVarP(&flagDone, "done", "d", false, "print only done tasks")
 }
