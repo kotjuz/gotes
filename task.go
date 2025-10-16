@@ -68,6 +68,8 @@ func (s *TaskStore) Delete(id int) error {
 	return SaveTasks(s.filePath, s.tasks)
 }
 
+// removed invalid duplicate; DeleteAll is implemented below
+
 func (s *TaskStore) Print() {
 	for _, t := range s.List() {
 		if t.Done {
@@ -76,4 +78,10 @@ func (s *TaskStore) Print() {
 			fmt.Printf("%d# %s\n", t.ID, t.Name)
 		}
 	}
+}
+
+func (s *TaskStore) DeleteAll() error {
+	s.tasks = s.tasks[:0]
+	s.nextID = 1
+	return SaveTasks(s.filePath, s.tasks)
 }
