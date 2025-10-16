@@ -9,18 +9,32 @@ import (
 )
 
 var DeleteTask func(int) error
+var DeleteAll func() error
+
+var (
+	flagDelAll bool
+)
 
 var deleteCmd = &cobra.Command{
 	Use:   "delete [task ID]",
 	Short: "delete a task by ID",
 	Long:  "delete a task by ID long",
 	Run: func(cmd *cobra.Command, args []string) {
+		if flagDelAll {
+			if DeleteAll == nil {
+				fmt.Println("delete: store not initialized")
+				return
+			}
+			DeleteAll()
+			return
+		}
+
 		if DeleteTask == nil {
 			fmt.Println("delete: store not initialized")
 			return
 		}
 		if len(args) == 0 {
-			fmt.Println("delete: please provie a task ID")
+			fmt.Println("delete: please provide a task ID")
 			return
 		}
 		ID, err := strconv.Atoi(strings.TrimSpace(strings.Join(args, " ")))
@@ -38,4 +52,5 @@ var deleteCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
+	deleteCmd.Flags().BoolVarP(&flagDelAll, "all", "a", false, "delete all tasks")
 }
