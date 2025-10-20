@@ -12,6 +12,7 @@ func main() {
 	appcmd.AddTask = taskStore.Add
 	appcmd.DeleteTask = taskStore.Delete
 	appcmd.DeleteAll = taskStore.DeleteAll
+	appcmd.ToggleTask = taskStore.Toggle
 	appcmd.PrintAll = taskStore.Print
 	appcmd.PrintDone = func() {
 		for _, t := range taskStore.List() {
