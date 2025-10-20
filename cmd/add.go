@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// AddTask is injected from main, e.g.: cmd.AddTask = taskStore.Add
 var AddTask func(string) error
 
 var addCmd = &cobra.Command{
