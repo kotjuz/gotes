@@ -6,6 +6,23 @@ import (
 	appcmd "github.com/kotjuz/cli_notes/cmd"
 )
 
+// Task wrapper to implement TaskInterface
+type taskWrapper struct {
+	task *Task
+}
+
+func (t *taskWrapper) GetID() int {
+	return t.task.ID
+}
+
+func (t *taskWrapper) GetName() string {
+	return t.task.Name
+}
+
+func (t *taskWrapper) GetDone() bool {
+	return t.task.Done
+}
+
 func main() {
 	taskStore, _ := NewTaskStore("C:\\Users\\rkota\\Desktop\\projekty_go_git\\cli_notes\\test.json")
 	// inject store methods into cobra commands
@@ -13,6 +30,15 @@ func main() {
 	appcmd.DeleteTask = taskStore.Delete
 	appcmd.DeleteAll = taskStore.DeleteAll
 	appcmd.ToggleTask = taskStore.Toggle
+	appcmd.ToggleTaskTUI = taskStore.Toggle
+	appcmd.GetTasksTUI = func() []appcmd.TaskInterface {
+		rawTasks := taskStore.List()
+		tasks := make([]appcmd.TaskInterface, len(rawTasks))
+		for i, task := range rawTasks {
+			tasks[i] = &taskWrapper{task: task}
+		}
+		return tasks
+	}
 	appcmd.PrintAll = taskStore.Print
 	appcmd.PrintDone = func() {
 		for _, t := range taskStore.List() {
