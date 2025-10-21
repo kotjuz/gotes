@@ -1,4 +1,4 @@
-<p align="center">
+<p align="left">
   <img src="assets/gotes_logo.png" alt="gotes logo" width="600"/>
 </p>
 
@@ -9,7 +9,7 @@ Tasks are stored locally in a simple **JSON file**, so everything stays fast, mi
 
 ---
 
-## ✨ Features
+##  Features
 
 - 📝 Add, delete, toggle and print tasks from the command line  
 - 💾 All tasks are persisted in a JSON file (`test.json` by default)  
@@ -24,7 +24,7 @@ Tasks are stored locally in a simple **JSON file**, so everything stays fast, mi
 
 ---
 
-## 🚀 Installation
+##  Installation
 
 ```bash
 git clone https://github.com/<your-username>/gotes.git
@@ -36,3 +36,30 @@ go install
 
 # show available commands
 gotes --help
+
+
+## Project structure
+gotes/
+├── cmd/
+│   ├── add.go          
+│   ├── delete.go   
+│   ├── print.go        
+│   ├── toggle.go      
+│   ├── tui.go        
+│   └── root.go        
+│
+├── internal/
+│   ├── filemanager.go  
+│   └── task.go       
+│
+├── main.go            
+├── test.json           
+├── go.mod
+├── go.sum
+└── LICENSE
+
+
+
+Created by Rafal Kotarski (kotjuz)
+
+MIT License © 2025
