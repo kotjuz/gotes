@@ -4,11 +4,12 @@ import (
 	"fmt"
 
 	appcmd "github.com/kotjuz/cli_notes/cmd"
+	"github.com/kotjuz/cli_notes/internal"
 )
 
 // Task wrapper to implement TaskInterface
 type taskWrapper struct {
-	task *Task
+	task *internal.Task
 }
 
 func (t *taskWrapper) GetID() int {
@@ -24,7 +25,7 @@ func (t *taskWrapper) GetDone() bool {
 }
 
 func main() {
-	taskStore, _ := NewTaskStore("C:\\Users\\rkota\\Desktop\\projekty_go_git\\cli_notes\\test.json")
+	taskStore, _ := internal.NewTaskStore("C:\\Users\\rkota\\Desktop\\projekty_go_git\\cli_notes\\test.json")
 	// inject store methods into cobra commands
 	appcmd.AddTask = taskStore.Add
 	appcmd.DeleteTask = taskStore.Delete
