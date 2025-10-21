@@ -71,7 +71,7 @@ func (s *TaskStore) Delete(id int) error {
 func (s *TaskStore) Print() {
 	for _, t := range s.List() {
 		if t.Done {
-			fmt.Printf("(Done✅) %d# %s\n", t.ID, t.Name)
+			fmt.Printf("✅ %d# %s\n", t.ID, t.Name)
 		} else {
 			fmt.Printf("%d# %s\n", t.ID, t.Name)
 		}
