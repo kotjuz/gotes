@@ -39,6 +39,7 @@ gotes --help
 ```
 
 ## Project structure
+```bash
 gotes/
 ├── cmd/
 │   ├── add.go          
@@ -59,7 +60,7 @@ gotes/
 └── LICENSE
 
 
-
+```
 
 Created by Rafal Kotarski (kotjuz)
 MIT License © 2025
