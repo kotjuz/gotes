@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/gotes_logo.png" alt="gotes logo" width="120"/>
+  <img src="assets/gotes_logo.png" alt="gotes logo" width="600"/>
 </p>
 
 # gotes — A Simple Terminal Task Manager in Go
