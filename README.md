@@ -36,7 +36,7 @@ go install
 
 # show available commands
 gotes --help
-
+```
 
 ## Project structure
 gotes/
@@ -60,6 +60,6 @@ gotes/
 
 
 
-Created by Rafal Kotarski (kotjuz)
 
+Created by Rafal Kotarski (kotjuz)
 MIT License © 2025
