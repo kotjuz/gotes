@@ -1,0 +1,47 @@
+[
+	{
+		"id": 1,
+		"name": "Add flags such as toggle (or shorter way like tg)",
+		"done": false
+	},
+	{
+		"id": 2,
+		"name": "Maybe add a flag for user to set the .json with tasks",
+		"done": false
+	},
+	{
+		"id": 3,
+		"name": "And handle the error if user wants to e.g. save tasks but nor file is set'",
+		"done": true
+	},
+	{
+		"id": 4,
+		"name": "Defienetly change the way that tasks are printed",
+		"done": true
+	},
+	{
+		"id": 6,
+		"name": "Think about writing notes in markdown",
+		"done": false
+	},
+	{
+		"id": 7,
+		"name": "Maybe have an option to have more interactive cnotes (or gotes) e.g. that i can move my arrows (strzalki xd) to switch between categories / files",
+		"done": false
+	},
+	{
+		"id": 8,
+		"name": "add better gui like colors etc.",
+		"done": false
+	},
+	{
+		"id": 9,
+		"name": "Add features like adding priority, category, sorting task by them, filtering",
+		"done": false
+	},
+	{
+		"id": 10,
+		"name": "Add option for exporting tasks",
+		"done": false
+	}
+]
