@@ -12,7 +12,7 @@
 	{
 		"id": 3,
 		"name": "And handle the error if user wants to e.g. save tasks but nor file is set'",
-		"done": true
+		"done": false
 	},
 	{
 		"id": 4,
@@ -27,7 +27,7 @@
 	{
 		"id": 7,
 		"name": "Maybe have an option to have more interactive cnotes (or gotes) e.g. that i can move my arrows (strzalki xd) to switch between categories / files",
-		"done": false
+		"done": true
 	},
 	{
 		"id": 8,
@@ -42,6 +42,16 @@
 	{
 		"id": 10,
 		"name": "Add option for exporting tasks",
+		"done": false
+	},
+	{
+		"id": 11,
+		"name": "Add --edit flag with e shortcut",
+		"done": false
+	},
+	{
+		"id": 12,
+		"name": "Future: split adding into adding tasks, and notes, so when someone wants to add new note ,e.g in markdown, he writes note -md and the markdown like (or nano like) editor opens in terminal",
 		"done": false
 	}
 ]
