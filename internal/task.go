@@ -83,3 +83,19 @@ func (s *TaskStore) DeleteAll() error {
 	s.nextID = 1
 	return SaveTasks(s.filePath, s.tasks)
 }
+
+func (s *TaskStore) Edit(id int, taskName string) error {
+	found := false
+	for _, task := range s.tasks {
+		if task.ID == id {
+			task.Name = taskName
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return fmt.Errorf("task with id %d not found", id)
+	}
+	return SaveTasks(s.filePath, s.tasks)
+}
