@@ -25,7 +25,7 @@ func (t *taskWrapper) GetDone() bool {
 }
 
 func main() {
-	taskStore, _ := internal.NewTaskStore("C:\\Users\\rkota\\Desktop\\projekty_go_git\\cli_notes\\szkola.json")
+	taskStore, _ := internal.NewTaskStore("C:\\Users\\rkota\\Desktop\\projekty_go_git\\cli_notes\\test.json")
 	// inject store methods into cobra commands
 	appcmd.AddTask = taskStore.Add
 	appcmd.DeleteTask = taskStore.Delete
@@ -57,6 +57,7 @@ func main() {
 			}
 		}
 	}
+	appcmd.EditTaskName = taskStore.Edit
 
 	appcmd.Execute()
 }
