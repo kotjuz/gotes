@@ -2,56 +2,67 @@
 	{
 		"id": 1,
 		"name": "Add flags such as toggle (or shorter way like tg)",
-		"done": false
+		"done": false,
+		"priority": 0
 	},
 	{
 		"id": 2,
 		"name": "Maybe add a flag for user to set the .json with tasks",
-		"done": false
+		"done": false,
+		"priority": 0
 	},
 	{
 		"id": 3,
 		"name": "And handle the error if user wants to e.g. save tasks but nor file is set'",
-		"done": false
+		"done": false,
+		"priority": 0
 	},
 	{
 		"id": 4,
 		"name": "Defienetly change the way that tasks are printed",
-		"done": true
+		"done": true,
+		"priority": 0
 	},
 	{
 		"id": 6,
 		"name": "Think about writing notes in markdown",
-		"done": false
+		"done": true,
+		"priority": 0
 	},
 	{
 		"id": 7,
 		"name": "Maybe have an option to have more interactive cnotes (or gotes) e.g. that i can move my arrows (strzalki xd) to switch between categories / files",
-		"done": true
+		"done": true,
+		"priority": 0
 	},
 	{
 		"id": 8,
 		"name": "add better gui like colors etc.",
-		"done": false
+		"done": false,
+		"priority": 0
 	},
 	{
 		"id": 9,
 		"name": "Add features like adding priority, category, sorting task by them, filtering",
-		"done": false
+		"done": false,
+		"priority": 0
 	},
 	{
 		"id": 10,
 		"name": "Add option for exporting tasks",
-		"done": false
+		"done": false,
+		"priority": 1
 	},
 	{
 		"id": 11,
 		"name": "Add --edit flag with e shortcut",
-		"done": false
+		"done": false,
+		"priority": 2
 	},
 	{
 		"id": 12,
 		"name": "Future: split adding into adding tasks, and notes, so when someone wants to add new note ,e.g in markdown, he writes note -md and the markdown like (or nano like) editor opens in terminal",
-		"done": false
+		"done": false,
+		"priority": 3
 	}
 ]

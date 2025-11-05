@@ -44,16 +44,14 @@ func main() {
 	appcmd.PrintDone = func() {
 		for _, t := range taskStore.List() {
 			if t.Done {
-				if t.Done {
-					fmt.Printf("(Done✅) %d# %s\n", t.ID, t.Name)
-				}
+				fmt.Printf("%s✅ %d# %s%s\n", t.Priority.ColorCode(), t.ID, t.Name, internal.ResetColor)
 			}
 		}
 	}
 	appcmd.PrintUndone = func() {
 		for _, t := range taskStore.List() {
 			if !t.Done {
-				fmt.Printf("%d# %s\n", t.ID, t.Name)
+				fmt.Printf("%s %d# %s%s\n", t.Priority.ColorCode(), t.ID, t.Name, internal.ResetColor)
 			}
 		}
 	}
