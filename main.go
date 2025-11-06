@@ -23,6 +23,12 @@ func (t *taskWrapper) GetName() string {
 func (t *taskWrapper) GetDone() bool {
 	return t.task.Done
 }
+func (t *taskWrapper) GetPriorityColor() string {
+	return t.task.Priority.ColorCode()
+}
+func (t *taskWrapper) GetResetColor() string {
+	return internal.ResetColor
+}
 
 func main() {
 	taskStore, _ := internal.NewTaskStore("C:\\Users\\rkota\\Desktop\\projekty_go_git\\cli_notes\\test.json")
@@ -56,6 +62,7 @@ func main() {
 		}
 	}
 	appcmd.EditTaskName = taskStore.Edit
+	appcmd.SetPriority = taskStore.SetPriority
 
 	appcmd.Execute()
 }

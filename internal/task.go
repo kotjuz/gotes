@@ -144,7 +144,13 @@ func (s *TaskStore) Edit(id int, taskName string) error {
 	return SaveTasks(s.filePath, s.tasks)
 }
 
-func (s *TaskStore) SetPriority(id int, priority Priority) error {
+func (s *TaskStore) SetPriority(id, priorityInt int) error {
+	priority := Priority(priorityInt)
+
+	if priority < Low || priority > Urgent {
+		return fmt.Errorf("invalid priority value: %d", priorityInt)
+	}
+
 	found := false
 	for _, task := range s.tasks {
 		if task.ID == id {
