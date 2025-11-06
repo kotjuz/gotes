@@ -29,15 +29,15 @@ func (p Priority) String() string {
 func (p Priority) ColorCode() string {
 	switch p {
 	case Low:
-		return "\033[36m" // Cyan
+		return "\033[38;5;153m" // Pastel cyan
 	case Normal:
-		return "\033[37m" // White/Default
+		return "\033[38;5;250m" // Light gray / neutral
 	case High:
-		return "\033[33m" // Yellow
+		return "\033[38;5;222m" // Soft yellow
 	case Urgent:
-		return "\033[31m" // Red
+		return "\033[38;5;203m" // Pastel red/pink
 	default:
-		return "\033[37m"
+		return "\033[38;5;250m" // fallback neutral
 	}
 }
 
