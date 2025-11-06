@@ -19,6 +19,8 @@ type TaskInterface interface {
 	GetID() int
 	GetName() string
 	GetDone() bool
+	GetPriorityColor() string
+	GetResetColor() string
 }
 
 // TUI model for BubbleTea
@@ -110,7 +112,7 @@ func (m model) View() string {
 			status = "✅"
 		}
 
-		s += fmt.Sprintf("%s %s %d# %s\n", cursor, status, task.GetID(), task.GetName())
+		s += fmt.Sprintf("%s%s %s %d# %s%s\n", task.GetPriorityColor(), cursor, status, task.GetID(), task.GetName(), task.GetResetColor())
 	}
 
 	s += "\nPress ↑/↓ to navigate, Enter to toggle, 'r' to refresh, 'q' to quit\n"
