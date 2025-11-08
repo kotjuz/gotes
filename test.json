@@ -2,7 +2,7 @@
 	{
 		"id": 1,
 		"name": "Add flags such as toggle (or shorter way like tg)",
-		"done": false,
+		"done": true,
 		"priority": 0
 	},
 	{
@@ -56,7 +56,7 @@
 	{
 		"id": 11,
 		"name": "Add --edit flag with e shortcut",
-		"done": false,
+		"done": true,
 		"priority": 2
 	},
 	{
