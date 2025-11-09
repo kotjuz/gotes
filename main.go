@@ -37,7 +37,7 @@ func (t *taskWrapper) GetBoard() string {
 }
 
 func main() {
-	taskStore, _ := internal.NewTaskStore("C:\\Users\\rkota\\Desktop\\projekty_go_git\\cli_notes\\gptjson.json")
+	taskStore, _ := internal.NewTaskStore("C:\\Users\\rkota\\Desktop\\projekty_go_git\\gt\\test.json")
 
 	// inject store methods into cobra commands
 	appcmd.AddTask = taskStore.Add
