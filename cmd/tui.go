@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
@@ -10,8 +11,10 @@ import (
 
 // TUI command variables
 var (
-	ToggleTaskTUI func(int) error
-	GetTasksTUI   func() []TaskInterface
+	ToggleTaskTUI    func(int) error
+	GetTasksByBoard  func(string) []TaskInterface
+	GetBoards        func() []string
+	CreateBoardInTUI func(string) error
 )
 
 // TaskInterface for TUI
@@ -21,13 +24,28 @@ type TaskInterface interface {
 	GetDone() bool
 	GetPriorityColor() string
 	GetResetColor() string
+	GetBoard() string
 }
+
+// View modes
+type viewMode int
+
+const (
+	boardSelectionMode viewMode = iota
+	taskViewMode
+	createBoardMode
+)
 
 // TUI model for BubbleTea
 type model struct {
-	tasks    []TaskInterface
-	cursor   int
-	quitting bool
+	mode          viewMode
+	boards        []string
+	tasks         []TaskInterface
+	cursor        int
+	selectedBoard string
+	quitting      bool
+	newBoardInput string
+	creatingBoard bool
 }
 
 // BubbleTea messages
@@ -35,12 +53,19 @@ type toggleMsg struct {
 	id int
 }
 
+type refreshMsg struct{}
+
 // Initial model
-func initialModel(tasks []TaskInterface) model {
+func initialModel(boards []string) model {
 	return model{
-		tasks:    tasks,
-		cursor:   0,
-		quitting: false,
+		mode:          boardSelectionMode,
+		boards:        boards,
+		tasks:         []TaskInterface{},
+		cursor:        0,
+		selectedBoard: "",
+		quitting:      false,
+		newBoardInput: "",
+		creatingBoard: false,
 	}
 }
 
@@ -53,37 +78,111 @@ func (m model) Init() tea.Cmd {
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q":
-			m.quitting = true
-			return m, tea.Quit
-		case "up", "k":
-			if m.cursor > 0 {
-				m.cursor--
-			}
-		case "down", "j":
-			if m.cursor < len(m.tasks)-1 {
-				m.cursor++
-			}
-		case "enter", " ":
-			if len(m.tasks) > 0 && m.cursor < len(m.tasks) {
-				return m, func() tea.Msg {
-					if ToggleTaskTUI != nil {
-						ToggleTaskTUI(m.tasks[m.cursor].GetID())
+		// Handle board creation mode separately
+		if m.creatingBoard {
+			switch msg.String() {
+			case "esc", "ctrl+c":
+				m.creatingBoard = false
+				m.newBoardInput = ""
+			case "enter":
+				if m.newBoardInput != "" {
+					boardName := strings.TrimSpace(m.newBoardInput)
+					if !strings.HasPrefix(boardName, "@") {
+						boardName = "@" + boardName
 					}
-					return toggleMsg{id: m.tasks[m.cursor].GetID()}
+					if CreateBoardInTUI != nil {
+						CreateBoardInTUI(boardName)
+					}
+					// Refresh boards
+					if GetBoards != nil {
+						m.boards = GetBoards()
+					}
+					m.creatingBoard = false
+					m.newBoardInput = ""
+				}
+			case "backspace":
+				if len(m.newBoardInput) > 0 {
+					m.newBoardInput = m.newBoardInput[:len(m.newBoardInput)-1]
+				}
+			default:
+				// Only allow alphanumeric and some special chars
+				if len(msg.String()) == 1 {
+					m.newBoardInput += msg.String()
 				}
 			}
-		case "r":
-			// Refresh tasks
-			if GetTasksTUI != nil {
-				m.tasks = GetTasksTUI()
+			return m, nil
+		}
+
+		// Normal mode key handling
+		switch m.mode {
+		case boardSelectionMode:
+			switch msg.String() {
+			case "ctrl+c", "q":
+				m.quitting = true
+				return m, tea.Quit
+			case "up", "k":
+				if m.cursor > 0 {
+					m.cursor--
+				}
+			case "down", "j":
+				if m.cursor < len(m.boards)-1 {
+					m.cursor++
+				}
+			case "enter":
+				if len(m.boards) > 0 && m.cursor < len(m.boards) {
+					m.selectedBoard = m.boards[m.cursor]
+					m.mode = taskViewMode
+					m.cursor = 0
+					// Load tasks for selected board
+					if GetTasksByBoard != nil {
+						m.tasks = GetTasksByBoard(m.selectedBoard)
+					}
+				}
+			case "ctrl+n":
+				m.creatingBoard = true
+				m.newBoardInput = ""
+			}
+
+		case taskViewMode:
+			switch msg.String() {
+			case "ctrl+c":
+				m.quitting = true
+				return m, tea.Quit
+			case "q":
+				// Go back to board selection
+				m.mode = boardSelectionMode
+				m.cursor = 0
+				m.selectedBoard = ""
+				m.tasks = []TaskInterface{}
+			case "up", "k":
+				if m.cursor > 0 {
+					m.cursor--
+				}
+			case "down", "j":
+				if m.cursor < len(m.tasks)-1 {
+					m.cursor++
+				}
+			case "enter", " ":
+				if len(m.tasks) > 0 && m.cursor < len(m.tasks) {
+					return m, func() tea.Msg {
+						if ToggleTaskTUI != nil {
+							ToggleTaskTUI(m.tasks[m.cursor].GetID())
+						}
+						return toggleMsg{id: m.tasks[m.cursor].GetID()}
+					}
+				}
+			case "r":
+				// Refresh tasks
+				if GetTasksByBoard != nil {
+					m.tasks = GetTasksByBoard(m.selectedBoard)
+				}
 			}
 		}
+
 	case toggleMsg:
 		// Task was toggled, refresh the task list
-		if GetTasksTUI != nil {
-			m.tasks = GetTasksTUI()
+		if GetTasksByBoard != nil && m.selectedBoard != "" {
+			m.tasks = GetTasksByBoard(m.selectedBoard)
 		}
 	}
 	return m, nil
@@ -95,16 +194,65 @@ func (m model) View() string {
 		return "Goodbye!\n"
 	}
 
-	if len(m.tasks) == 0 {
-		return "No tasks found. Press 'q' to quit.\n"
+	// Board creation input
+	if m.creatingBoard {
+		s := "📋 Create New Board\n\n"
+		s += "Enter board name (without @): "
+		s += m.newBoardInput + "█\n\n"
+		s += "Press Enter to create, Esc to cancel\n"
+		return s
 	}
 
-	s := "📝 Task Manager\n\n"
+	switch m.mode {
+	case boardSelectionMode:
+		return m.viewBoardSelection()
+	case taskViewMode:
+		return m.viewTasks()
+	default:
+		return "Unknown view\n"
+	}
+}
+
+func (m model) viewBoardSelection() string {
+	if len(m.boards) == 0 {
+		return "No boards found. Press Ctrl+N to create a new board, 'q' to quit.\n"
+	}
+
+	s := "📋 My Boards\n\n"
+
+	for i, board := range m.boards {
+		cursor := " "
+		if m.cursor == i {
+			cursor = "▶"
+		}
+
+		// Color boards differently
+		color := "\033[38;5;117m" // Light blue for boards
+		if board == "@default" {
+			color = "\033[38;5;229m" // Light yellow for default
+		}
+
+		s += fmt.Sprintf("%s %s%s\033[0m\n", cursor, color, board)
+	}
+
+	s += "\nPress ↑/↓ to navigate, Enter to select, Ctrl+N for new board, 'q' to quit\n"
+	return s
+}
+
+func (m model) viewTasks() string {
+	boardColor := "\033[38;5;117m"
+	s := fmt.Sprintf("📝 Tasks in %s%s\033[0m\n\n", boardColor, m.selectedBoard)
+
+	if len(m.tasks) == 0 {
+		s += "No tasks in this board.\n\n"
+		s += "Press 'q' to go back to boards\n"
+		return s
+	}
 
 	for i, task := range m.tasks {
 		cursor := " "
 		if m.cursor == i {
-			cursor = ">"
+			cursor = "▶"
 		}
 
 		status := " "
@@ -112,28 +260,34 @@ func (m model) View() string {
 			status = "✅"
 		}
 
-		s += fmt.Sprintf("%s%s %s %d# %s%s\n", task.GetPriorityColor(), cursor, status, task.GetID(), task.GetName(), task.GetResetColor())
+		s += fmt.Sprintf("%s%s %s %d# %s%s\n",
+			task.GetPriorityColor(),
+			cursor,
+			status,
+			task.GetID(),
+			task.GetName(),
+			task.GetResetColor())
 	}
 
-	s += "\nPress ↑/↓ to navigate, Enter to toggle, 'r' to refresh, 'q' to quit\n"
+	s += "\nPress ↑/↓ to navigate, Enter/Space to toggle, 'r' to refresh, 'q' to go back\n"
 	return s
 }
 
 var tuiCmd = &cobra.Command{
 	Use:   "tui",
 	Short: "Interactive terminal user interface",
-	Long:  "Launch an interactive TUI to manage your tasks",
+	Long:  "Launch an interactive TUI to manage your tasks and boards",
 	Run: func(cmd *cobra.Command, args []string) {
-		if GetTasksTUI == nil || ToggleTaskTUI == nil {
+		if GetBoards == nil || GetTasksByBoard == nil || ToggleTaskTUI == nil {
 			fmt.Println("TUI: store not initialized")
 			return
 		}
 
-		// Get tasks directly
-		tasks := GetTasksTUI()
+		// Get boards
+		boards := GetBoards()
 
 		// Initialize and run BubbleTea
-		p := tea.NewProgram(initialModel(tasks))
+		p := tea.NewProgram(initialModel(boards))
 		if _, err := p.Run(); err != nil {
 			fmt.Printf("Error running TUI: %v\n", err)
 			os.Exit(1)
