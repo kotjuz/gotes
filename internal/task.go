@@ -148,6 +148,19 @@ func (s *TaskStore) AddToBoard(taskName, board string) error {
 	return SaveTasks(s.filePath, s.tasks)
 }
 
+// dummy function to create an empty, done task, so when printing it will not show - it's only for the emty board to be seen
+func (s *TaskStore) AddEmptyTask(board string) error {
+	s.tasks = append(s.tasks, &Task{
+		ID:       s.nextID,
+		Name:     "",
+		Done:     true,
+		Priority: Normal,
+		Board:    board,
+	})
+	s.nextID += 1
+	return SaveTasks(s.filePath, s.tasks)
+}
+
 func (s *TaskStore) Toggle(id int) error {
 	for _, t := range s.tasks {
 		if t.ID == id {

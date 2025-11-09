@@ -250,6 +250,10 @@ func (m model) viewTasks() string {
 	}
 
 	for i, task := range m.tasks {
+		if task.GetName() == "" {
+			continue
+		}
+
 		cursor := " "
 		if m.cursor == i {
 			cursor = "▶"

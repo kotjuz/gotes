@@ -37,7 +37,7 @@ func (t *taskWrapper) GetBoard() string {
 }
 
 func main() {
-	taskStore, _ := internal.NewTaskStore("C:\\Users\\rkota\\Desktop\\projekty_go_git\\cli_notes\\test.json")
+	taskStore, _ := internal.NewTaskStore("C:\\Users\\rkota\\Desktop\\projekty_go_git\\cli_notes\\gptjson.json")
 
 	// inject store methods into cobra commands
 	appcmd.AddTask = taskStore.Add
@@ -72,7 +72,8 @@ func main() {
 		// a separate board creation logic if you want
 		// For now, boards are created automatically when tasks are added to them
 		// So this is just a placeholder - the board will be created when first task is added
-		return nil
+
+		return taskStore.AddEmptyTask(boardName)
 	}
 
 	appcmd.PrintAll = taskStore.Print
