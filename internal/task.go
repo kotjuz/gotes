@@ -1,6 +1,9 @@
 package internal
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 type Priority int
 
@@ -108,17 +111,16 @@ func (s *TaskStore) GetBoards() []string {
 		boards = append(boards, board)
 	}
 
-	// Sort to put @default first
-	result := []string{}
-	for _, b := range boards {
-		if b == "@default" {
-			result = append([]string{b}, result...)
-		} else {
-			result = append(result, b)
+	sort.SliceStable(boards, func(i, j int) bool {
+		if boards[i] == "@default" {
+			return true
 		}
-	}
-
-	return result
+		if boards[j] == "@default" {
+			return false
+		}
+		return boards[i] < boards[j]
+	})
+	return boards
 }
 
 func (s *TaskStore) Add(taskName string) error {
@@ -263,4 +265,17 @@ func (s *TaskStore) SetBoard(id int, board string) error {
 		return fmt.Errorf("task with id %d not found", id)
 	}
 	return SaveTasks(s.filePath, s.tasks)
+}
+
+func (s *TaskStore) DeleteBoard(board string) error {
+	out := s.tasks[:0]
+
+	for _, task := range s.tasks {
+		if task.Board != board {
+			out = append(out, task)
+		}
+	}
+	s.tasks = out
+	return SaveTasks(s.filePath, s.tasks)
+
 }

@@ -78,6 +78,9 @@ func main() {
 		return taskStore.AddEmptyTask(boardName)
 	}
 
+	appcmd.DeleteBoardTUI = taskStore.DeleteBoard
+	appcmd.DeleteTaskTUI = taskStore.Delete
+
 	appcmd.PrintAll = taskStore.Print
 	appcmd.PrintDone = func() {
 		for _, t := range taskStore.List() {

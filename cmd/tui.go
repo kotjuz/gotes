@@ -16,6 +16,8 @@ var (
 	GetBoards        func() []string
 	CreateBoardInTUI func(string) error
 	AddTaskToBoard   func(string, string) error // taskName, boardName
+	DeleteTaskTUI    func(int) error
+	DeleteBoardTUI   func(string) error // deletes board and all its tasks
 )
 
 // TaskInterface for TUI
@@ -55,6 +57,14 @@ type model struct {
 // BubbleTea messages
 type toggleMsg struct {
 	id int
+}
+
+type deleteTaskMsg struct {
+	id int
+}
+
+type deleteBoardMsg struct {
+	board string
 }
 
 type refreshMsg struct{}
@@ -183,6 +193,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "ctrl+n":
 				m.creatingBoard = true
 				m.newBoardInput = ""
+			case "ctrl+d":
+				// Delete selected board
+				if len(m.boards) > 0 && m.cursor < len(m.boards) && m.boards[m.cursor] != "@default" {
+					boardToDelete := m.boards[m.cursor]
+					return m, func() tea.Msg {
+						if DeleteBoardTUI != nil {
+							DeleteBoardTUI(boardToDelete)
+						}
+						return deleteBoardMsg{board: boardToDelete}
+					}
+				}
 			}
 
 		case taskViewMode:
@@ -221,6 +242,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "ctrl+n":
 				m.creatingTask = true
 				m.newTaskInput = ""
+			case "ctrl+d":
+				// Delete selected task
+				if len(m.tasks) > 0 && m.cursor < len(m.tasks) {
+					taskToDelete := m.tasks[m.cursor]
+					return m, func() tea.Msg {
+						if DeleteTaskTUI != nil {
+							DeleteTaskTUI(taskToDelete.GetID())
+						}
+						return deleteTaskMsg{id: taskToDelete.GetID()}
+					}
+				}
 			}
 		}
 
@@ -228,6 +260,32 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Task was toggled, refresh the task list
 		if GetTasksByBoard != nil && m.selectedBoard != "" {
 			m.tasks = GetTasksByBoard(m.selectedBoard)
+		}
+
+	case deleteTaskMsg:
+		// Task was deleted, refresh the task list
+		if GetTasksByBoard != nil && m.selectedBoard != "" {
+			m.tasks = GetTasksByBoard(m.selectedBoard)
+			// Adjust cursor if needed
+			if m.cursor >= len(m.tasks) && len(m.tasks) > 0 {
+				m.cursor = len(m.tasks) - 1
+			}
+			if len(m.tasks) == 0 {
+				m.cursor = 0
+			}
+		}
+
+	case deleteBoardMsg:
+		// Board was deleted, refresh the board list
+		if GetBoards != nil {
+			m.boards = GetBoards()
+			// Adjust cursor if needed
+			if m.cursor >= len(m.boards) && len(m.boards) > 0 {
+				m.cursor = len(m.boards) - 1
+			}
+			if len(m.boards) == 0 {
+				m.cursor = 0
+			}
 		}
 	}
 	return m, nil
@@ -290,7 +348,7 @@ func (m model) viewBoardSelection() string {
 		s += fmt.Sprintf("%s %s%s\033[0m\n", cursor, color, board)
 	}
 
-	s += "\nPress ↑/↓ to navigate, Enter to select, Ctrl+N for new board, 'q' to quit\n"
+	s += "\nPress ↑/↓ to navigate, Enter to select, Ctrl+N for new board, Ctrl+D to delete, 'q' to quit\n"
 	return s
 }
 
@@ -328,7 +386,7 @@ func (m model) viewTasks() string {
 			task.GetResetColor())
 	}
 
-	s += "\nPress ↑/↓ to navigate, Enter/Space to toggle, Ctrl+N to add task, 'r' to refresh, 'q' to go back\n"
+	s += "\nPress ↑/↓ to navigate, Enter/Space to toggle, Ctrl+N to add, Ctrl+D to delete, 'r' to refresh, 'q' to go back\n"
 	return s
 }
 
