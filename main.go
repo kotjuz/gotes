@@ -66,7 +66,9 @@ func main() {
 	}
 
 	appcmd.GetBoards = taskStore.GetBoards
-
+	appcmd.AddTaskToBoard = func(taskName, boardName string) error {
+		return taskStore.AddToBoard(taskName, boardName)
+	}
 	appcmd.CreateBoardInTUI = func(boardName string) error {
 		// Just add a dummy task to create the board, or you can implement
 		// a separate board creation logic if you want

@@ -15,6 +15,7 @@ var (
 	GetTasksByBoard  func(string) []TaskInterface
 	GetBoards        func() []string
 	CreateBoardInTUI func(string) error
+	AddTaskToBoard   func(string, string) error // taskName, boardName
 )
 
 // TaskInterface for TUI
@@ -34,6 +35,7 @@ const (
 	boardSelectionMode viewMode = iota
 	taskViewMode
 	createBoardMode
+	createTaskMode
 )
 
 // TUI model for BubbleTea
@@ -46,6 +48,8 @@ type model struct {
 	quitting      bool
 	newBoardInput string
 	creatingBoard bool
+	newTaskInput  string
+	creatingTask  bool
 }
 
 // BubbleTea messages
@@ -66,6 +70,8 @@ func initialModel(boards []string) model {
 		quitting:      false,
 		newBoardInput: "",
 		creatingBoard: false,
+		newTaskInput:  "",
+		creatingTask:  false,
 	}
 }
 
@@ -78,7 +84,7 @@ func (m model) Init() tea.Cmd {
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		// Handle board creation mode separately
+		// Handle board creation mode
 		if m.creatingBoard {
 			switch msg.String() {
 			case "esc", "ctrl+c":
@@ -108,6 +114,42 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				// Only allow alphanumeric and some special chars
 				if len(msg.String()) == 1 {
 					m.newBoardInput += msg.String()
+				}
+			}
+			return m, nil
+		}
+
+		// Handle task creation mode
+		if m.creatingTask {
+			switch msg.String() {
+			case "esc", "ctrl+c":
+				m.creatingTask = false
+				m.newTaskInput = ""
+			case "enter":
+				if m.newTaskInput != "" {
+					taskName := strings.TrimSpace(m.newTaskInput)
+					if AddTaskToBoard != nil {
+						AddTaskToBoard(taskName, m.selectedBoard)
+					}
+					// Refresh tasks
+					if GetTasksByBoard != nil {
+						m.tasks = GetTasksByBoard(m.selectedBoard)
+					}
+					m.creatingTask = false
+					m.newTaskInput = ""
+					// Move cursor to the last task (newly added)
+					if len(m.tasks) > 0 {
+						m.cursor = len(m.tasks) - 1
+					}
+				}
+			case "backspace":
+				if len(m.newTaskInput) > 0 {
+					m.newTaskInput = m.newTaskInput[:len(m.newTaskInput)-1]
+				}
+			default:
+				// Allow any character for task names
+				if len(msg.String()) == 1 {
+					m.newTaskInput += msg.String()
 				}
 			}
 			return m, nil
@@ -176,6 +218,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if GetTasksByBoard != nil {
 					m.tasks = GetTasksByBoard(m.selectedBoard)
 				}
+			case "ctrl+n":
+				m.creatingTask = true
+				m.newTaskInput = ""
 			}
 		}
 
@@ -199,6 +244,16 @@ func (m model) View() string {
 		s := "📋 Create New Board\n\n"
 		s += "Enter board name (without @): "
 		s += m.newBoardInput + "█\n\n"
+		s += "Press Enter to create, Esc to cancel\n"
+		return s
+	}
+
+	// Task creation input
+	if m.creatingTask {
+		boardColor := "\033[38;5;117m"
+		s := fmt.Sprintf("✨ Add New Task to %s%s\033[0m\n\n", boardColor, m.selectedBoard)
+		s += "Enter task name: "
+		s += m.newTaskInput + "█\n\n"
 		s += "Press Enter to create, Esc to cancel\n"
 		return s
 	}
@@ -245,7 +300,7 @@ func (m model) viewTasks() string {
 
 	if len(m.tasks) == 0 {
 		s += "No tasks in this board.\n\n"
-		s += "Press 'q' to go back to boards\n"
+		s += "Press Ctrl+N to add a new task, 'q' to go back to boards\n"
 		return s
 	}
 
@@ -273,7 +328,7 @@ func (m model) viewTasks() string {
 			task.GetResetColor())
 	}
 
-	s += "\nPress ↑/↓ to navigate, Enter/Space to toggle, 'r' to refresh, 'q' to go back\n"
+	s += "\nPress ↑/↓ to navigate, Enter/Space to toggle, Ctrl+N to add task, 'r' to refresh, 'q' to go back\n"
 	return s
 }
 
