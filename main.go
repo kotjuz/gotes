@@ -66,6 +66,7 @@ func main() {
 	}
 
 	appcmd.GetBoards = taskStore.GetBoards
+	appcmd.EditTask = taskStore.Edit
 	appcmd.AddTaskToBoard = func(taskName, boardName string) error {
 		return taskStore.AddToBoard(taskName, boardName)
 	}
