@@ -17,7 +17,8 @@ var (
 	CreateBoardInTUI func(string) error
 	AddTaskToBoard   func(string, string) error // taskName, boardName
 	DeleteTaskTUI    func(int) error
-	DeleteBoardTUI   func(string) error // deletes board and all its tasks
+	DeleteBoardTUI   func(string) error      // deletes board and all its tasks
+	EditTask         func(int, string) error //changes task name to new
 )
 
 // TaskInterface for TUI
@@ -42,16 +43,19 @@ const (
 
 // TUI model for BubbleTea
 type model struct {
-	mode          viewMode
-	boards        []string
-	tasks         []TaskInterface
-	cursor        int
-	selectedBoard string
-	quitting      bool
-	newBoardInput string
-	creatingBoard bool
-	newTaskInput  string
-	creatingTask  bool
+	mode               viewMode
+	boards             []string
+	tasks              []TaskInterface
+	cursor             int
+	selectedBoard      string
+	quitting           bool
+	newBoardInput      string
+	creatingBoard      bool
+	newTaskInput       string
+	creatingTask       bool
+	editedTaskInput    string
+	editingTask        bool
+	selectedTaskToEdit TaskInterface
 }
 
 // BubbleTea messages
@@ -72,16 +76,19 @@ type refreshMsg struct{}
 // Initial model
 func initialModel(boards []string) model {
 	return model{
-		mode:          boardSelectionMode,
-		boards:        boards,
-		tasks:         []TaskInterface{},
-		cursor:        0,
-		selectedBoard: "",
-		quitting:      false,
-		newBoardInput: "",
-		creatingBoard: false,
-		newTaskInput:  "",
-		creatingTask:  false,
+		mode:               boardSelectionMode,
+		boards:             boards,
+		tasks:              []TaskInterface{},
+		cursor:             0,
+		selectedBoard:      "",
+		quitting:           false,
+		newBoardInput:      "",
+		creatingBoard:      false,
+		newTaskInput:       "",
+		creatingTask:       false,
+		editedTaskInput:    "",
+		editingTask:        false,
+		selectedTaskToEdit: nil,
 	}
 }
 
@@ -127,6 +134,41 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 			return m, nil
+		}
+
+		if m.editingTask {
+			switch msg.String() {
+			case "esc", "ctrl+c":
+				m.editingTask = false
+				m.editedTaskInput = ""
+			case "enter":
+				if strings.TrimSpace(m.editedTaskInput) != "" {
+					taskName := strings.TrimSpace(m.editedTaskInput)
+					if EditTask != nil {
+						EditTask(m.selectedTaskToEdit.GetID(), taskName)
+					}
+
+					if GetTasksByBoard != nil {
+						m.tasks = GetTasksByBoard(m.selectedBoard)
+					}
+					m.editingTask = false
+					m.editedTaskInput = ""
+
+					if len(m.tasks) > 0 {
+						m.cursor = len(m.tasks) - 1
+					}
+				}
+			case "backspace":
+				if len(m.editedTaskInput) > 0 {
+					m.editedTaskInput = m.editedTaskInput[:len(m.editedTaskInput)-1]
+				}
+			default:
+				if len(msg.String()) == 1 {
+					m.editedTaskInput += msg.String()
+				}
+			}
+			return m, nil
+
 		}
 
 		// Handle task creation mode
@@ -242,6 +284,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "ctrl+n":
 				m.creatingTask = true
 				m.newTaskInput = ""
+			//Edit tasks' name
+			case "ctrl+e":
+				if m.tasks[m.cursor].GetName() != "" {
+					m.selectedTaskToEdit = m.tasks[m.cursor]
+					m.editingTask = true
+					m.editedTaskInput = ""
+				}
 			case "ctrl+d":
 				// Delete selected task
 				if len(m.tasks) > 0 && m.cursor < len(m.tasks) {
@@ -316,6 +365,14 @@ func (m model) View() string {
 		return s
 	}
 
+	if m.editingTask {
+		s := fmt.Sprintf("Edit name of the task %s%d# %s\033[0m\n\n", m.selectedTaskToEdit.GetPriorityColor(), m.selectedTaskToEdit.GetID(), m.selectedTaskToEdit.GetName())
+		s += "Enter new task name: "
+		s += m.editedTaskInput + "█\n\n"
+		s += "Press Enter to edit, Esc to cancel\n"
+		return s
+	}
+
 	switch m.mode {
 	case boardSelectionMode:
 		return m.viewBoardSelection()
@@ -386,7 +443,7 @@ func (m model) viewTasks() string {
 			task.GetResetColor())
 	}
 
-	s += "\nPress ↑/↓ to navigate, Enter/Space to toggle, Ctrl+N to add, Ctrl+D to delete, 'r' to refresh, 'q' to go back\n"
+	s += "\nPress ↑/↓ to navigate, Enter/Space to toggle, Ctrl+N to add, Ctrl+D to delete, Ctrl+E to edit, 'r' to refresh, 'q' to go back\n"
 	return s
 }
 
