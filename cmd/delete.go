@@ -17,8 +17,8 @@ var (
 
 var deleteCmd = &cobra.Command{
 	Use:   "delete [task ID]",
-	Short: "delete a task by ID",
-	Long:  "delete a task by ID long",
+	Short: "Delete a task",
+	Long:  "Deletes a task by its ID. You can also delete all tasks using the --all flag.",
 	Run: func(cmd *cobra.Command, args []string) {
 		if flagDelAll {
 			if DeleteAll == nil {

@@ -449,8 +449,8 @@ func (m model) viewTasks() string {
 
 var tuiCmd = &cobra.Command{
 	Use:   "tui",
-	Short: "Interactive terminal user interface",
-	Long:  "Launch an interactive TUI to manage your tasks and boards",
+	Short: "Launch the interactive TUI",
+	Long:  "Opens the interactive BubbleTea-based terminal UI for managing tasks and boards. Allows creating boards, adding tasks, toggling status, renaming tasks, and deleting items using keyboard shortcuts.",
 	Run: func(cmd *cobra.Command, args []string) {
 		if GetBoards == nil || GetTasksByBoard == nil || ToggleTaskTUI == nil {
 			fmt.Println("TUI: store not initialized")

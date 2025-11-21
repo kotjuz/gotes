@@ -8,13 +8,8 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "gt",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Lightweight CLI task manager with boards and TUI",
+	Long:  "GT is a lightweight command-line task manager that supports boards, priorities, and an interactive TUI. Use it to quickly add, edit, view, and organize tasks directly in the terminal.",
 }
 
 func Execute() {
