@@ -18,9 +18,10 @@ var (
 
 // printCmd represents the print command
 var printCmd = &cobra.Command{
-	Use:   "print",
-	Short: "Print tasks",
-	Long:  "Displays tasks in the terminal. By default prints only undone tasks. Use flags to print all tasks or only completed ones.",
+	Use:     "print",
+	Aliases: []string{"p"},
+	Short:   "Print tasks",
+	Long:    "Displays tasks in the terminal. By default prints only undone tasks. Use flags to print all tasks or only completed ones.",
 	Run: func(cmd *cobra.Command, args []string) {
 		if flagAll {
 			if PrintAll == nil {

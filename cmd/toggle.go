@@ -11,9 +11,10 @@ import (
 var ToggleTask func(int) error
 
 var toggleCmd = &cobra.Command{
-	Use:   "tg [task ID]",
-	Short: "Toggle task completion",
-	Long:  "Toggles the completion state of a task by its ID. If the task is undone, it becomes done. If it's done, it becomes undone.",
+	Use:     "toggle [task ID]",
+	Aliases: []string{"tg"},
+	Short:   "Toggle task completion",
+	Long:    "Toggles the completion state of a task by its ID. If the task is undone, it becomes done. If it's done, it becomes undone.",
 	Run: func(cmd *cobra.Command, args []string) {
 		if ToggleTask == nil {
 			fmt.Println("toggle: store not initialized")

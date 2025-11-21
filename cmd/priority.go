@@ -11,8 +11,9 @@ import (
 var SetPriority func(int, int) error
 
 var priorityCmd = &cobra.Command{
-	Use:   "priority [task ID][priority ID]",
-	Short: "edit task priority by task ID",
+	Use:     "priority [task ID][priority ID]",
+	Aliases: []string{"prio"},
+	Short:   "edit task priority by task ID",
 	Long: `edit task priority by task ID. Avaliable priority ID's:
 		0 - Low
 		1 - Normal

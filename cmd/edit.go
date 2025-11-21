@@ -11,9 +11,10 @@ import (
 var EditTaskName func(int, string) error
 
 var editCmd = &cobra.Command{
-	Use:   "edit [task ID][task name]",
-	Short: "Edit task name",
-	Long:  "Edits the name of an existing task by its ID. Takes the ID as the first parameter and the new task name as the remaining arguments.",
+	Use:     "edit [task ID][task name]",
+	Aliases: []string{"e"},
+	Short:   "Edit task name",
+	Long:    "Edits the name of an existing task by its ID. Takes the ID as the first parameter and the new task name as the remaining arguments.",
 	Run: func(cmd *cobra.Command, args []string) {
 		if EditTaskName == nil {
 			fmt.Println("edit: store not initialized")
