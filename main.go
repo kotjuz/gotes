@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	appcmd "github.com/kotjuz/cli_notes/cmd"
 	"github.com/kotjuz/cli_notes/internal"
@@ -37,7 +39,9 @@ func (t *taskWrapper) GetBoard() string {
 }
 
 func main() {
-	taskStore, _ := internal.NewTaskStore("C:\\Users\\rkota\\Desktop\\projekty_go_git\\gt\\test.json")
+	exe, _ := os.Executable()
+	dir := filepath.Dir(exe)
+	taskStore, _ := internal.NewTaskStore(filepath.Join(dir, "gettaskautogen.json"))
 
 	// inject store methods into cobra commands
 	appcmd.AddTask = taskStore.Add
