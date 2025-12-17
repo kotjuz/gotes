@@ -14,7 +14,16 @@ Tasks are stored locally in a simple **JSON file**, so everything stays fast, mi
 ##  Features
 
 - 📝 Add, delete, toggle, print tasks and more from the command line:
-  - `gt` 
+  - `gt` - print avaliable commands (same as gt --help)
+  - `add` - add new task
+  - `completion` - generate the autocompletion script for the specified shell
+  - `delete` - delete a task by ID
+  - `edit` - edit task name by ID
+  - `print` - print tasks
+  - `priority` - edit task priority by task ID
+  - `tg` - toggle task
+  - `tui` - open TUI
+  
 - 💾 All tasks are persisted in a JSON file (`gttaskautogen.json` by default)  
 - 🖥️ Interactive **TUI mode** with keyboard navigation:
   - `↑` / `↓` — move between tasks  
