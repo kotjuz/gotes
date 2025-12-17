@@ -1,23 +1,27 @@
-# !! README NOT DONE - THIS US THE OLD ONE !!
+# !! README NOT DONE - THIS IS THE OLD ONE !!
 
 <p align="left">
-  <img src="assets/gotes_logo.png" alt="gotes logo" width="400"/>
+  <img src="assets/gotes_logo.png" alt="gotes logo" width="380"/>
 </p>
 
-# gotes — A Simple Terminal Task Manager in Go
+# gotes — Terminal Task Manager written in Go
 
-**gotes** is a lightweight, terminal-based task manager built with **Go**, powered by **Cobra** for command-line structure and **Bubble Tea** for an interactive TUI (Text User Interface).  
+**gotes** is a lightweight, terminal-based task manager built with **Go**, powered by **Cobra** for command-line structure and **Bubble Tea** for an interactive TUI.  
 Tasks are stored locally in a simple **JSON file**, so everything stays fast, minimal, and dependency-free.
 
 ---
 
 ##  Features
 
-- 📝 Add, delete, toggle and print tasks from the command line  
-- 💾 All tasks are persisted in a JSON file (`test.json` by default)  
+- 📝 Add, delete, toggle, print tasks and more from the command line:
+  - `gt` 
+- 💾 All tasks are persisted in a JSON file (`gttaskautogen.json` by default)  
 - 🖥️ Interactive **TUI mode** with keyboard navigation:
   - `↑` / `↓` — move between tasks  
-  - `Enter` — toggle task completion    
+  - `Enter` — toggle task completion
+  - `Ctrl+N` — create new board/task
+  - `Ctrl+D` — delete selected board/task
+  - `Ctrl+E` — edit tasks` name/priority         
   - `q` — quit the interface  
 - ⚙️ Built with:
   - [`spf13/cobra`](https://github.com/spf13/cobra) — command-line framework  
@@ -28,6 +32,13 @@ Tasks are stored locally in a simple **JSON file**, so everything stays fast, mi
 
 ##  Installation
 
+### For users:
+- Install the release for your OS
+- Unzip the downloaded file
+- Run the installation script (.exe)
+
+
+### For devs:
 ```bash
 git clone https://github.com/<your-username>/gotes.git
 cd gotes
